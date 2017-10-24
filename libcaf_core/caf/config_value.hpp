@@ -24,8 +24,9 @@
 #include <cstdint>
 
 #include "caf/atom.hpp"
-#include "caf/variant.hpp"
+#include "caf/deep_to_string.hpp"
 #include "caf/duration.hpp"
+#include "caf/variant.hpp"
 
 namespace caf {
 
@@ -54,7 +55,9 @@ public:
 
   config_value(const config_value& other) = default;
 
-  template <class T>
+  template <class T,
+            class E = detail::enable_if_t<
+              detail::tl_index_of<types, detail::decay_t<T>>::value != -1>>
   config_value(T&& x) : data_(std::forward<T>(x)) {
     // nop
   }
@@ -133,6 +136,14 @@ private:
   variant_type data_;
 };
 
+inline bool operator==(const config_value& x, const config_value& y) {
+  return x.data() == y.data();
+}
+
+inline bool operator!=(const config_value& x, const config_value& y) {
+  return !(x == y);
+}
+
 /// @relates config_value
 template <class Visitor>
 auto visit(Visitor&& f, config_value& x)
@@ -175,6 +186,11 @@ T* get_if(config_value* x) {
 template <class T>
 const T* get_if(const config_value* x) {
   return x != nullptr ? get_if<T>(&(x->data())) : nullptr;
+}
+
+/// @relates config_value
+inline std::string to_string(const config_value& x) {
+  return deep_to_string(x.data());
 }
 
 /// @relates config_value
