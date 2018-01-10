@@ -112,7 +112,7 @@ struct open_stream_msg {
 /// @relates stream_handshake_msg
 template <class Inspector>
 typename Inspector::result_type inspect(Inspector& f, open_stream_msg& x) {
-  return f(meta::type_name("stream_handshake_msg"), x.slot, x.msg, x.prev_stage,
+  return f(meta::type_name("open_stream_msg"), x.slot, x.msg, x.prev_stage,
            x.original_stage, x.priority);
 }
 
